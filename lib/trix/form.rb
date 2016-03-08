@@ -1,5 +1,9 @@
+require 'action_view'
+require 'active_support/core_ext'
+
 module TrixEditorHelper
-  cattr_accessor(:id, instance_accessor: false) { 0 }
+  mattr_accessor(:id, instance_accessor: false)
+  class_variable_set('@@id', 0)
 
   def trix_editor_tag(name, value = nil, options = {})
     options.symbolize_keys!
@@ -8,6 +12,7 @@ module TrixEditorHelper
 
     attributes[:autofocus] = true if options[:autofocus]
     attributes[:placeholder] = options[:placeholder] if options[:placeholder]
+    attributes[:spellcheck] = options[:spellcheck] if options[:spellcheck]
     attributes[:input] = options[:input] || "trix_input_#{TrixEditorHelper.id += 1}"
     attributes[:toolbar] = options[:toolbar] if options[:toolbar]
 
@@ -25,7 +30,7 @@ module ActionView
     module Tags
       class TrixEditor < Base
         include TrixEditorHelper
-        delegate :dom_id, to: ActionView::RecordIdentifier
+        delegate :dom_id, to: :'@template_object'
 
         def render
           options = @options.stringify_keys
